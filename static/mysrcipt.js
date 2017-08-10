@@ -63,12 +63,12 @@
 /******/ 	__webpack_require__.p = "/static/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 92);
+/******/ 	return __webpack_require__(__webpack_require__.s = 112);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 85:
+/***/ 102:
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -10329,7 +10329,7 @@ return jQuery;
 
 /***/ }),
 
-/***/ 92:
+/***/ 112:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10338,7 +10338,7 @@ return jQuery;
 setTimeout(function (e) {
     $('.startimg').fadeOut();
 }, 3000);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(85)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(102)))
 
 /***/ })
 

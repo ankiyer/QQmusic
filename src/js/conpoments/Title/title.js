@@ -1,6 +1,6 @@
 import React from 'react';
 import Search from './search.js';
-require('../../../less/fristpage/title.less');
+require('../../../less/page/title.less');
 export default class Title extends React.Component{
     constructor() {
         super()
