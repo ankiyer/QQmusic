@@ -1,0 +1,70 @@
+{
+    "data":{
+        "给我一个理由忘记":{
+        "musicurl": "src/music/给我一个理由忘记.mp3",
+        "singer":"A-Lin",
+        "musicicon":"src/musicicon/给我一个理由忘记.jpg"
+        },
+        "LoveU2":{
+            "musicurl":"src/music/LoveU2.mp3",
+            "singer":"陈伟霆",
+            "musicicon":"src/musicicon/LoveU2.jpg"
+        },
+        "YouBelongWithMe": {
+            "musicurl":"src/music/YouBelongWithMe.mp3",
+            "singer":"泰勒",
+            "musicicon":"src/musicicon/YouBelongWithMe.jpg"
+        },
+        "单恋高校": {
+            "musicurl":"src/music/单恋高校.mp3",
+            "singer":"陈冠希",
+            "musicicon":"src/musicicon/单恋高校.jpg"
+        },
+        "二缺一": {
+            "musicurl":"src/music/二缺一.mp3",
+            "singer":"蔡卓妍",
+            "musicicon":"src/musicicon/二缺一.jpg"
+        },
+        "女校男生": {
+            "musicurl":"src/music/女校男生.mp3",
+            "singer":"twins",
+            "musicicon":"src/musicicon/女校男生.jpg"
+        },
+        "偏偏喜欢你":{
+            "musicurl":"src/music/偏偏喜欢你.mp3",
+            "singer":"陈百强",
+            "musicicon":"src/musicicon/偏偏喜欢你.jpg"
+        },
+        "千千阙歌": {
+            "musicurl":"src/music/千千阙歌.mp3",
+            "singer":"陈慧娴",
+            "musicicon":"src/musicicon/千千阙歌.jpg"
+        },
+        "失恋": {
+            "musicurl":"src/music/失恋.mp3",
+            "singer":"草蜢",
+            "musicicon":"src/musicicon/失恋.jpg"
+        },
+        "失恋无罪":{
+        "musicurl": "src/music/失恋无罪.mp3",
+        "singer":"A-Lin",
+        "musicicon":"src/musicicon/失恋无罪.jpg"
+        },
+        "我不是伟人": {
+        "musicurl": "src/music/我不是伟人.mp3",
+        "singer":"陈小春",
+        "musicicon":"src/musicicon/我不是伟人.jpg"
+        },
+        "战争":{
+        "musicurl": "src/music/战争.mp3",
+        "singer":"陈冠希",
+        "musicicon":"src/musicicon/战争.jpg"
+        },
+        "友谊之光":{
+       "musicurl": "src/music/友谊之光.mp3",
+       "singer":"玛利亚",
+       "musicicon":"src/musicicon/友谊之光.jpg"
+    }
+        },
+    "length":13
+}

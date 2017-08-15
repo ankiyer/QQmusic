@@ -11,7 +11,7 @@ export default class Page extends React.Component{
             <div className='page' style={this.props.realstyle}>
                 <Title zhutiClick={this.props.zhutiClick.bind(this)}></Title>
                 <div className='all-page'>
-                <Fristpagedown loginClick={this.props.loginClick} loginstyle={this.props.loginstyle}></Fristpagedown>
+                <Fristpagedown loginClick={this.props.loginClick} loginstyle={this.props.loginstyle} zhutiClick={this.props.zhutiClick}></Fristpagedown>
                 </div>
             </div>
         )
