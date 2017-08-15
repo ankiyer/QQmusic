@@ -1,5 +1,5 @@
-export function zhuti(){
+export function zhutiaction(){
     return {
-        type:'zhuti'
+        type:'zhuti',
     }
 }
