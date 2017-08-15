@@ -20422,7 +20422,7 @@ selectorFactory) {
       Connect.prototype.notifyNestedSubsOnComponentDidUpdate = function notifyNestedSubsOnComponentDidUpdate() {
         // `componentDidUpdate` is conditionally implemented when `onStateChange` determines it
         // needs to notify nested subs. Once called, it unimplements itself until further state
-        // changes occur. Doing it this way vs having a permanent `componentDidMount` that does
+        // changes occur. Doing it this way vs having a permanent `componentDidUpdate` that does
         // a boolean check every time avoids an extra method call most of the time, resulting
         // in some perf boost.
         this.componentDidUpdate = undefined;
@@ -20468,14 +20468,31 @@ selectorFactory) {
 
     if (process.env.NODE_ENV !== 'production') {
       Connect.prototype.componentWillUpdate = function componentWillUpdate() {
+        var _this2 = this;
+
         // We are hot reloading!
         if (this.version !== version) {
           this.version = version;
           this.initSelector();
 
-          if (this.subscription) this.subscription.tryUnsubscribe();
+          // If any connected descendants don't hot reload (and resubscribe in the process), their
+          // listeners will be lost when we unsubscribe. Unfortunately, by copying over all
+          // listeners, this does mean that the old versions of connected descendants will still be
+          // notified of state changes; however, their onStateChange function is a no-op so this
+          // isn't a huge deal.
+          var oldListeners = [];
+
+          if (this.subscription) {
+            oldListeners = this.subscription.listeners.get();
+            this.subscription.tryUnsubscribe();
+          }
           this.initSubscription();
-          if (shouldHandleStateChanges) this.subscription.trySubscribe();
+          if (shouldHandleStateChanges) {
+            this.subscription.trySubscribe();
+            oldListeners.forEach(function (listener) {
+              return _this2.subscription.listeners.subscribe(listener);
+            });
+          }
         }
       };
     }
@@ -21949,8 +21966,8 @@ if(content.locals) module.exports = content.locals;
 if(false) {
 	// When the styles change, update the <style> tags
 	if(!content.locals) {
-		module.hot.accept("!!../../node_modules/css-loader/index.js?url=false!../../node_modules/less-loader/dist/cjs.js!./index.less", function() {
-			var newContent = require("!!../../node_modules/css-loader/index.js?url=false!../../node_modules/less-loader/dist/cjs.js!./index.less");
+		module.hot.accept("!!../../node_modules/_css-loader@0.28.4@css-loader/index.js?url=false!../../node_modules/_less-loader@4.0.5@less-loader/dist/cjs.js!./index.less", function() {
+			var newContent = require("!!../../node_modules/_css-loader@0.28.4@css-loader/index.js?url=false!../../node_modules/_less-loader@4.0.5@less-loader/dist/cjs.js!./index.less");
 			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 			update(newContent);
 		});
@@ -21960,12 +21977,7 @@ if(false) {
 }
 
 /***/ }),
-/* 110 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "img/firstpage.jpg";
-
-/***/ }),
+/* 110 */,
 /* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26117,29 +26129,49 @@ var KNOWN_STATICS = {
     length: true,
     prototype: true,
     caller: true,
+    callee: true,
     arguments: true,
     arity: true
 };
 
-var isGetOwnPropertySymbolsAvailable = typeof Object.getOwnPropertySymbols === 'function';
+var getOwnPropertySymbols = Object.getOwnPropertySymbols;
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+var getPrototypeOf = Object.getPrototypeOf;
+var objectPrototype = getPrototypeOf && getPrototypeOf(Object);
+var getOwnPropertyNames = Object.getOwnPropertyNames;
 
-module.exports = function hoistNonReactStatics(targetComponent, sourceComponent, customStatics) {
+module.exports = function hoistNonReactStatics(targetComponent, sourceComponent, blacklist) {
     if (typeof sourceComponent !== 'string') {
         // don't hoist over string (html) components
-        var keys = Object.getOwnPropertyNames(sourceComponent);
 
-        /* istanbul ignore else */
-        if (isGetOwnPropertySymbolsAvailable) {
-            keys = keys.concat(Object.getOwnPropertySymbols(sourceComponent));
+        if (objectPrototype) {
+            var inheritedComponent = getPrototypeOf(sourceComponent);
+            if (inheritedComponent && inheritedComponent !== objectPrototype) {
+                hoistNonReactStatics(targetComponent, inheritedComponent, blacklist);
+            }
+        }
+
+        var keys = getOwnPropertyNames(sourceComponent);
+
+        if (getOwnPropertySymbols) {
+            keys = keys.concat(getOwnPropertySymbols(sourceComponent));
         }
 
         for (var i = 0; i < keys.length; ++i) {
-            if (!REACT_STATICS[keys[i]] && !KNOWN_STATICS[keys[i]] && (!customStatics || !customStatics[keys[i]])) {
-                try {
-                    targetComponent[keys[i]] = sourceComponent[keys[i]];
-                } catch (error) {}
+            var key = keys[i];
+            if (!REACT_STATICS[key] && !KNOWN_STATICS[key] && (!blacklist || !blacklist[key])) {
+                // Only hoist enumerables and non-enumerable functions
+                if (propIsEnumerable.call(sourceComponent, key) || typeof sourceComponent[key] === 'function') {
+                    try {
+                        // Avoid failures from read-only properties
+                        targetComponent[key] = sourceComponent[key];
+                    } catch (e) {}
+                }
             }
         }
+
+        return targetComponent;
     }
 
     return targetComponent;
@@ -36255,7 +36287,6 @@ function createProvider() {
     children: _propTypes2.default.element.isRequired
   };
   Provider.childContextTypes = (_Provider$childContex = {}, _Provider$childContex[storeKey] = _PropTypes.storeShape.isRequired, _Provider$childContex[subscriptionKey] = _PropTypes.subscriptionShape, _Provider$childContex);
-  Provider.displayName = 'Provider';
 
   return Provider;
 }
@@ -36754,6 +36785,9 @@ function createListenerCollection() {
       for (var i = 0; i < listeners.length; i++) {
         listeners[i]();
       }
+    },
+    get: function get() {
+      return next;
     },
     subscribe: function subscribe(listener) {
       var isSubscribed = true;
@@ -38886,12 +38920,12 @@ var QQmusic = function (_React$Component) {
       return _react2.default.createElement(
         'div',
         { className: 'DOM' },
-        _react2.default.createElement('img', { className: 'startimg', src: __webpack_require__(110) }),
+        _react2.default.createElement('img', { className: 'startimg', src: './src/img/firstpage.jpg' }),
         _react2.default.createElement(_page2.default, { zhutiClick: function zhutiClick() {
             dispatch((0, _zhuti.zhutiaction)());
           }, realstyle: Firstpagestyle, loginClick: function loginClick() {
             dispatch((0, _login.login)());
-          }, loginstyle: state.loginicon }),
+          }, loginstyle: state.loginicon, tzhuti: state.tzhuti.zhuti }),
         _react2.default.createElement(_Zhuti2.default, { realstyle: Zhutistyle }),
         _react2.default.createElement(_reallogin2.default, { realstyle: realloginstyle, backClick: function backClick() {
             dispatch((0, _login.login)());
@@ -38958,7 +38992,7 @@ exports = module.exports = __webpack_require__(25)(undefined);
 
 
 // module
-exports.push([module.i, ".all-page {\n  height: 100%;\n}\n.all-page .fristpagedown {\n  height: 100%;\n}\n.all-page .fristpagedown .menu {\n  position: relative;\n}\n.all-page .fristpagedown .menu ul {\n  position: absolute;\n  top: 20px;\n  left: 10px;\n  right: 10px;\n}\n.all-page .fristpagedown .menu ul li {\n  margin-bottom: 20px;\n  margin-left: 50px;\n  margin-right: 20px;\n  float: left;\n}\n.all-page .fristpagedown .menu ul li div {\n  width: 45px;\n  height: 45px;\n  background-size: 45px 45px;\n}\n.all-page .fristpagedown .menu ul li span {\n  font-size: 12px;\n}\n#prelogin {\n  font-size: 12px;\n  margin-top: 10px;\n}\n#prelogin span {\n  font-size: 14px;\n  display: inline-block;\n  height: 50px;\n  line-height: 50px;\n  text-align: center;\n  width: 100%;\n}\n#prelogin #loginbtu {\n  letter-spacing: 2px;\n  width: 86px;\n  height: 25px;\n  line-height: 25px;\n  border: 1px solid #31c27c;\n  color: #31c27c;\n  text-align: center;\n  left: 50%;\n  position: relative;\n  margin-left: -43px;\n}\n#prelogin #loginbtu:hover {\n  color: white;\n  background-color: #31c27c;\n}\n#reallogin {\n  transform: translateY(100%);\n  transition: transform 0.5s;\n  width: 100%;\n  height: 100%;\n  background: url('src/img/login-icon.png');\n  position: absolute;\n  top: 0;\n  left: 0;\n  background-size: 100% 100%;\n}\n#reallogin #back {\n  color: white;\n  cursor: pointer;\n}\n#reallogin .topicon {\n  width: 150px;\n  height: 150px;\n  background-size: 150px 150px;\n  background-image: url('src/img/top-login-icon.png');\n  position: absolute;\n  top: 25%;\n  left: 35%;\n}\n#reallogin .logindiv {\n  position: absolute;\n  top: 60%;\n  left: 20%;\n}\n#reallogin .logindiv .hint {\n  color: red;\n}\n#reallogin .logindiv div {\n  color: white;\n  position: relative;\n  height: 30px;\n  margin-top: 10px;\n}\n#reallogin .logindiv div input {\n  letter-spacing: 1px;\n  height: 100%;\n  outline: none;\n  border: none;\n  top: 0;\n  position: absolute;\n  width: 75%;\n}\n#reallogin .logindiv div span {\n  display: inline-block;\n  width: 50px;\n  height: 30px;\n  text-align: center;\n  line-height: 30px;\n}\n#reallogin .logindiv .login {\n  text-align: center;\n  background: #2caf6f;\n  width: 88%;\n  margin-left: 15px;\n  line-height: 30px;\n}\n#Afterlogin {\n  display: none;\n  margin-top: 7px;\n  position: relative;\n}\n#Afterlogin .headicon {\n  position: relative;\n  transform: translateX(-50%);\n  left: 50%;\n  background-image: url('src/img/head-icon.jpg');\n  width: 40px;\n  height: 40px;\n  border-radius: 50%;\n  background-size: 40px 40px;\n}\n#Afterlogin span:before {\n  margin-right: 10px;\n  content: \"\\4E00\";\n}\n#Afterlogin span:after {\n  margin-left: 10px;\n  content: \"\\4E00\";\n}\n#Afterlogin span {\n  display: inline-block;\n  width: 100%;\n  text-align: center;\n  margin-top: 7px;\n  margin-bottom: 7px;\n}\n#Afterlogin .lvzuanicon {\n  position: relative;\n  transform: translateX(-50%);\n  left: 50%;\n  background-image: url('src/img/lvzuan-icon.png');\n  width: 30px;\n  height: 30px;\n  background-size: 110px 45px;\n  background-position-y: 40px;\n}\n* {\n  padding: 0;\n  margin: 0;\n  text-decoration: none;\n  list-style: none;\n}\n.startimg {\n  width: 100%;\n  height: 100%;\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 1000;\n}\n#qqmusic {\n  width: 100%;\n  height: 100%;\n}\nhtml {\n  overflow: hidden;\n  height: 100%;\n}\nbody {\n  height: 100%;\n}\n", ""]);
+exports.push([module.i, ".all-page {\n  height: 100%;\n}\n.all-page .fristpagedown {\n  height: 100%;\n}\n.all-page .fristpagedown .menu {\n  position: relative;\n}\n.all-page .fristpagedown .menu ul {\n  position: absolute;\n  top: 20px;\n  left: 10px;\n  right: 10px;\n}\n.all-page .fristpagedown .menu ul li {\n  margin-bottom: 20px;\n  margin-left: 50px;\n  margin-right: 20px;\n  float: left;\n}\n.all-page .fristpagedown .menu ul li div {\n  width: 45px;\n  height: 45px;\n  background-size: 45px 45px;\n}\n.all-page .fristpagedown .menu ul li span {\n  font-size: 12px;\n}\n#prelogin {\n  font-size: 12px;\n  margin-top: 10px;\n}\n#prelogin span {\n  font-size: 14px;\n  display: inline-block;\n  height: 50px;\n  line-height: 50px;\n  text-align: center;\n  width: 100%;\n}\n#prelogin #loginbtu {\n  letter-spacing: 2px;\n  width: 86px;\n  height: 25px;\n  line-height: 25px;\n  border: 1px solid #31c27c;\n  color: #31c27c;\n  text-align: center;\n  left: 50%;\n  position: relative;\n  margin-left: -43px;\n}\n#prelogin #loginbtu:hover {\n  color: white;\n  background-color: #31c27c;\n}\n#reallogin {\n  transform: translateY(100%);\n  transition: transform 0.5s;\n  width: 100%;\n  height: 100%;\n  background: url('src/img/login-icon.png');\n  position: absolute;\n  top: 0;\n  left: 0;\n  background-size: 100% 100%;\n}\n#reallogin #back {\n  color: white;\n  cursor: pointer;\n}\n#reallogin .topicon {\n  width: 150px;\n  height: 150px;\n  background-size: 150px 150px;\n  background-image: url('src/img/top-login-icon.png');\n  position: absolute;\n  top: 25%;\n  left: 50%;\n  transform: translateX(-50%);\n}\n#reallogin .logindiv {\n  position: absolute;\n  top: 60%;\n  left: 15%;\n}\n#reallogin .logindiv .hint {\n  color: red;\n}\n#reallogin .logindiv div {\n  color: white;\n  position: relative;\n  height: 30px;\n  margin-top: 10px;\n}\n#reallogin .logindiv div input {\n  letter-spacing: 1px;\n  height: 100%;\n  outline: none;\n  border: none;\n  top: 0;\n  position: absolute;\n  width: 75%;\n}\n#reallogin .logindiv div span {\n  display: inline-block;\n  width: 50px;\n  height: 30px;\n  text-align: center;\n  line-height: 30px;\n}\n#reallogin .logindiv .login {\n  text-align: center;\n  background: #2caf6f;\n  width: 88%;\n  margin-left: 15px;\n  line-height: 30px;\n}\n#Afterlogin {\n  display: none;\n  margin-top: 7px;\n  position: relative;\n}\n#Afterlogin .headicon {\n  position: relative;\n  transform: translateX(-50%);\n  left: 50%;\n  background-image: url('src/img/head-icon.jpg');\n  width: 40px;\n  height: 40px;\n  border-radius: 50%;\n  background-size: 40px 40px;\n}\n#Afterlogin span:before {\n  margin-right: 10px;\n  content: \"\\4E00\";\n}\n#Afterlogin span:after {\n  margin-left: 10px;\n  content: \"\\4E00\";\n}\n#Afterlogin span {\n  display: inline-block;\n  width: 100%;\n  text-align: center;\n  margin-top: 7px;\n  margin-bottom: 7px;\n}\n#Afterlogin .lvzuanicon {\n  position: relative;\n  transform: translateX(-50%);\n  left: 50%;\n  background-image: url('src/img/lvzuan-icon.png');\n  width: 30px;\n  height: 30px;\n  background-size: 110px 45px;\n  background-position-y: 40px;\n}\n* {\n  padding: 0;\n  margin: 0;\n  text-decoration: none;\n  list-style: none;\n}\n.startimg {\n  width: 100%;\n  height: 100%;\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 1000;\n}\n#qqmusic {\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n}\nhtml {\n  overflow: hidden;\n  height: 100%;\n}\nbody {\n  height: 100%;\n}\n", ""]);
 
 // exports
 
@@ -39021,8 +39055,8 @@ if(content.locals) module.exports = content.locals;
 if(false) {
 	// When the styles change, update the <style> tags
 	if(!content.locals) {
-		module.hot.accept("!!../../../node_modules/css-loader/index.js?url=false!../../../node_modules/less-loader/dist/cjs.js!./page.less", function() {
-			var newContent = require("!!../../../node_modules/css-loader/index.js?url=false!../../../node_modules/less-loader/dist/cjs.js!./page.less");
+		module.hot.accept("!!../../../node_modules/_css-loader@0.28.4@css-loader/index.js?url=false!../../../node_modules/_less-loader@4.0.5@less-loader/dist/cjs.js!./page.less", function() {
+			var newContent = require("!!../../../node_modules/_css-loader@0.28.4@css-loader/index.js?url=false!../../../node_modules/_less-loader@4.0.5@less-loader/dist/cjs.js!./page.less");
 			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 			update(newContent);
 		});
@@ -39047,8 +39081,8 @@ if(content.locals) module.exports = content.locals;
 if(false) {
 	// When the styles change, update the <style> tags
 	if(!content.locals) {
-		module.hot.accept("!!../../../node_modules/css-loader/index.js?url=false!../../../node_modules/less-loader/dist/cjs.js!./title.less", function() {
-			var newContent = require("!!../../../node_modules/css-loader/index.js?url=false!../../../node_modules/less-loader/dist/cjs.js!./title.less");
+		module.hot.accept("!!../../../node_modules/_css-loader@0.28.4@css-loader/index.js?url=false!../../../node_modules/_less-loader@4.0.5@less-loader/dist/cjs.js!./title.less", function() {
+			var newContent = require("!!../../../node_modules/_css-loader@0.28.4@css-loader/index.js?url=false!../../../node_modules/_less-loader@4.0.5@less-loader/dist/cjs.js!./title.less");
 			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 			update(newContent);
 		});
@@ -39073,8 +39107,8 @@ if(content.locals) module.exports = content.locals;
 if(false) {
 	// When the styles change, update the <style> tags
 	if(!content.locals) {
-		module.hot.accept("!!../../../node_modules/css-loader/index.js?url=false!../../../node_modules/less-loader/dist/cjs.js!./zhuti.less", function() {
-			var newContent = require("!!../../../node_modules/css-loader/index.js?url=false!../../../node_modules/less-loader/dist/cjs.js!./zhuti.less");
+		module.hot.accept("!!../../../node_modules/_css-loader@0.28.4@css-loader/index.js?url=false!../../../node_modules/_less-loader@4.0.5@less-loader/dist/cjs.js!./zhuti.less", function() {
+			var newContent = require("!!../../../node_modules/_css-loader@0.28.4@css-loader/index.js?url=false!../../../node_modules/_less-loader@4.0.5@less-loader/dist/cjs.js!./zhuti.less");
 			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 			update(newContent);
 		});

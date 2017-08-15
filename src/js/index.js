@@ -10,7 +10,7 @@ import {login} from './redux/actions/login.js';
 import {loginicon} from './redux/actions/login-icon.js';
 import { createStore } from 'redux';
 import Reallogin from './conpoments/login/reallogin.js';
-let store = createStore(reducers);  
+let store = createStore(reducers);
 class QQmusic extends React.Component{
     constructor(){
      super();
@@ -48,8 +48,8 @@ class QQmusic extends React.Component{
         console.log(realloginstyle)
       return (
         <div className='DOM'>
-          <img className="startimg" src={require('../img/firstpage.jpg')}></img>
-          <Page zhutiClick={ () => { dispatch(zhutiaction()) } } realstyle={Firstpagestyle} loginClick={()=>{dispatch(login())}} loginstyle={state.loginicon}></Page>
+          <img className="startimg" src='./src/img/firstpage.jpg'></img>
+          <Page zhutiClick={ () => { dispatch(zhutiaction()) } } realstyle={Firstpagestyle} loginClick={()=>{dispatch(login())}} loginstyle={state.loginicon} tzhuti={state.tzhuti.zhuti}></Page>
           <Zhuti realstyle={Zhutistyle}></Zhuti>
           <Reallogin realstyle={realloginstyle} backClick={()=>{dispatch(login())}} loginiconchange={()=>{dispatch(loginicon())}}></Reallogin>
         </div>
