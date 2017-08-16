@@ -1,11 +1,10 @@
 import { combineReducers } from 'redux';
-import {loginicon} from './loginicon.js'
+import {loginicon} from './loginicon.js';
+import {musicState} from './music-state.js';
 function tzhuti(state={zhuti:false},action){
     if(action.type=='zhuti'){
-        // console.log(state,'actionzhuti')
         state.zhuti=!state.zhuti;
     }
-    console.log(state)
     return {zhuti:state.zhuti};
 }
 function login(state={login:false},action){
@@ -17,5 +16,6 @@ function login(state={login:false},action){
 export default combineReducers({
     login,
     tzhuti,
-    loginicon
+    loginicon,
+    musicState
 }) 

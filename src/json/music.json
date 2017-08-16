@@ -1,4 +1,4 @@
-{
+getdata({
     "data":{
         "给我一个理由忘记":{
         "musicurl": "src/music/给我一个理由忘记.mp3",
@@ -67,4 +67,4 @@
     }
         },
     "length":13
-}
+})

@@ -63,12 +63,12 @@
 /******/ 	__webpack_require__.p = "/static/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 245);
+/******/ 	return __webpack_require__(__webpack_require__.s = 246);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 245:
+/***/ 246:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -77,6 +77,8 @@
 setTimeout(function (e) {
     $('.startimg').fadeOut();
 }, 3000);
+$('#playingmusic ul li').first().addClass('active');
+$('#min-music-source').children().eq(0).addClass('active');
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(36)))
 
 /***/ }),

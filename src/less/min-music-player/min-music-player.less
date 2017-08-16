@@ -1,0 +1,71 @@
+#minplayer{
+        width: 100%;
+        height: 45px;
+        position: fixed;
+        bottom: 0;
+        background-color: #f4f4f4;
+        border-top: 1px solid #DCDCDC;
+        font-size: 12px;
+        #playingmusic{
+            ul{
+                position: relative;
+                height: 45px;
+                li{    
+                    display: none;
+                    transition: display 0.4s;
+                    position: relative;
+                    width: 100%;
+                    height: 45px;
+                    float: left;
+                    #messagediv{
+                        margin-left: 20PX;
+                          #songandsinger{
+                                position: absolute;
+                                display: inline-block;
+                                margin-left: 10px;
+                                span{
+                                    display: block;
+                                    height: 20px;
+                                    line-height: 20px;
+                                }
+                            }
+                            img{
+                                height: 45px;
+                                width: 45px;
+                                border-radius: 50%;
+                            }
+                    }
+                }
+                
+                .active{
+                    
+                    display: block;
+                }
+            }
+        }
+        #minplayer-icon{
+                position: absolute;
+                display: inline-block;
+                width: 90px;
+                height: 45px;
+                top: 0;
+                // background: #000;
+                z-index: 1111;
+                right: 0;
+                #playstate{
+                    background-image: url('../QQmusic/src/img/stateicon.png');
+                    width: 30px;
+                    height: 30px;
+                    display: inline-block;
+                    
+                    background-size: 155px 210px;
+                }
+                .pause{
+                    
+                    background-position: -30px 0px;
+                }
+                .playing{
+                    background-position: -30px 60px;
+                }
+        }
+}
