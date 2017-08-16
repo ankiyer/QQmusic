@@ -15,7 +15,13 @@ export default class Page extends React.Component{
                 <div className='all-page'>
                 <Fristpagedown loginClick={this.props.loginClick} loginstyle={this.props.loginstyle} zhutiClick={this.props.zhutiClick} zhutistate={this.props.zhutistate}></Fristpagedown>
                 </div>
-                <Musicplaymin musicState={this.props.musicState} playstate={this.props.playstate}></Musicplaymin>
+                <Musicplaymin 
+                musicState={this.props.musicState} 
+                playstateswitch={this.props.playstateswitch} 
+                playindex={this.props.playindex}
+                playswitchpre={this.props.playswitchpre}
+                playswitchnext={this.props.playswitchnext}
+                ></Musicplaymin>
             </div>
         )
     }

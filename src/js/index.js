@@ -11,15 +11,21 @@ import {login} from './redux/actions/login.js';
 import {loginicon} from './redux/actions/login-icon.js';
 import { createStore } from 'redux';
 import Reallogin from './conpoments/login/reallogin.js';
+import {preplayindex} from './redux/actions/preplayindex.js';
+import {nextplayindex} from './redux/actions/nextplayindex.js';
 let store = createStore(reducers);
 class QQmusic extends React.Component{
     constructor(){
      super();
+     this.playtime=0;
     }
-    musicplay(){
-      if(this.props.state.musicState.musicState=='playing'){
-        $('#min-music-source').find('.active').play();
-      }
+    switchmusic(){
+      console.log()
+            if(this.props.state.musicState.musicState=='playing'){
+                $('#min-music-source')[0].play();
+            }else{
+                $('#min-music-source')[0].pause();
+            }
     }
     render(){
         let {state,dispatch}=this.props;
@@ -60,10 +66,14 @@ class QQmusic extends React.Component{
           loginClick={()=>{$('#reallogin').fadeIn();dispatch(login());}} 
           loginstyle={state.loginicon} 
           zhutistate={state.tzhuti.zhuti}
-          playstate={()=>{
-            this.musicplay();
+    
+          playstateswitch={()=>{
             dispatch(musicState())
+            this.switchmusic();
             }}
+          playindex={state.playindex.playindex}
+          playswitchpre={()=>{dispatch(preplayindex())}}
+          playswitchnext={()=>{dispatch(nextplayindex())}}
           ></Page>
           <Zhuti 
           realstyle={Zhutistyle} 

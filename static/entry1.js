@@ -21849,7 +21849,13 @@ var Page = function (_React$Component) {
                     { className: 'all-page' },
                     _react2.default.createElement(_fristdown2.default, { loginClick: this.props.loginClick, loginstyle: this.props.loginstyle, zhutiClick: this.props.zhutiClick, zhutistate: this.props.zhutistate })
                 ),
-                _react2.default.createElement(_musicPlayMin2.default, { musicState: this.props.musicState, playstate: this.props.playstate })
+                _react2.default.createElement(_musicPlayMin2.default, {
+                    musicState: this.props.musicState,
+                    playstateswitch: this.props.playstateswitch,
+                    playindex: this.props.playindex,
+                    playswitchpre: this.props.playswitchpre,
+                    playswitchnext: this.props.playswitchnext
+                })
             );
         }
     }]);
@@ -21927,6 +21933,8 @@ var _loginicon = __webpack_require__(247);
 
 var _musicState = __webpack_require__(256);
 
+var _playindex = __webpack_require__(258);
+
 function tzhuti() {
     var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { zhuti: false };
     var action = arguments[1];
@@ -21949,7 +21957,8 @@ exports.default = (0, _redux.combineReducers)({
     login: login,
     tzhuti: tzhuti,
     loginicon: _loginicon.loginicon,
-    musicState: _musicState.musicState
+    musicState: _musicState.musicState,
+    playindex: _playindex.playindex
 });
 
 /***/ }),
@@ -38843,6 +38852,10 @@ var _reallogin = __webpack_require__(103);
 
 var _reallogin2 = _interopRequireDefault(_reallogin);
 
+var _preplayindex = __webpack_require__(260);
+
+var _nextplayindex = __webpack_require__(259);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -38861,14 +38874,20 @@ var QQmusic = function (_React$Component) {
   function QQmusic() {
     _classCallCheck(this, QQmusic);
 
-    return _possibleConstructorReturn(this, (QQmusic.__proto__ || Object.getPrototypeOf(QQmusic)).call(this));
+    var _this = _possibleConstructorReturn(this, (QQmusic.__proto__ || Object.getPrototypeOf(QQmusic)).call(this));
+
+    _this.playtime = 0;
+    return _this;
   }
 
   _createClass(QQmusic, [{
-    key: 'musicplay',
-    value: function musicplay() {
+    key: 'switchmusic',
+    value: function switchmusic() {
+      console.log();
       if (this.props.state.musicState.musicState == 'playing') {
-        $('#min-music-source').find('.active').play();
+        $('#min-music-source')[0].play();
+      } else {
+        $('#min-music-source')[0].pause();
       }
     }
   }, {
@@ -38923,9 +38942,17 @@ var QQmusic = function (_React$Component) {
           },
           loginstyle: state.loginicon,
           zhutistate: state.tzhuti.zhuti,
-          playstate: function playstate() {
-            _this2.musicplay();
+
+          playstateswitch: function playstateswitch() {
             dispatch((0, _musicState.musicState)());
+            _this2.switchmusic();
+          },
+          playindex: state.playindex.playindex,
+          playswitchpre: function playswitchpre() {
+            dispatch((0, _preplayindex.preplayindex)());
+          },
+          playswitchnext: function playswitchnext() {
+            dispatch((0, _nextplayindex.nextplayindex)());
           }
         }),
         _react2.default.createElement(_Zhuti2.default, {
@@ -39171,26 +39198,11 @@ var Musicplaymin = function (_React$Component) {
         key: 'switchsong',
         value: function switchsong(events) {
             if (events.direction == 2) {
-                if ($('#playingmusic ul').find('.active').next().length) {
-                    $('#playingmusic ul').find('.active').removeClass().next().addClass('active');
-                    $('#min-music-source').find('.active').removeClass().next().addClass('active');
-                } else {
-                    $('#min-music-source').find('.active').removeClass();
-                    $('#min-music-source').children().first().addClass('active');
-                    $('#playingmusic ul').find('.active').removeClass();
-                    $('#playingmusic ul li').first().addClass('active');
-                }
-            } else if (events.direction == 4) {
-                if ($('#playingmusic ul').find('.active').prev().length) {
-                    $('#playingmusic ul').find('.active').removeClass().prev().addClass('active');
-                    $('#min-music-source').find('.active').removeClass().prev().addClass('active');
-                } else {
 
-                    $('#min-music-source').find('.active').removeClass();
-                    $('#min-music-source').children().last().addClass('active');
-                    $('#playingmusic ul').find('.active').removeClass();
-                    $('#playingmusic ul li').last().addClass('active');
-                }
+                this.props.playswitchnext();
+            } else if (events.direction == 4) {
+
+                this.props.playswitchpre();
             }
         }
     }, {
@@ -39198,6 +39210,12 @@ var Musicplaymin = function (_React$Component) {
         value: function componentDidMount() {
             var _this2 = this;
 
+            console.log($('#min-music-source')[0]);
+            if (this.props.musicState == 'playing') {
+                $('#min-music-source')[0].play();
+            } else {
+                $('#min-music-source')[0].pause();
+            }
             window.getdata = function (data) {
                 _this2.setState({
                     musicdata: data
@@ -39207,6 +39225,8 @@ var Musicplaymin = function (_React$Component) {
     }, {
         key: 'render',
         value: function render() {
+            var _this3 = this;
+
             var musicdata = this.state.musicdata,
                 num = musicdata.length,
                 arrmusicsource = new Array(),
@@ -39219,7 +39239,6 @@ var Musicplaymin = function (_React$Component) {
                 singer.push(musicdata.data[value].singer);
                 musicname.push(value);
             }
-            console.log(this.props.musicState);
             return _react2.default.createElement(
                 Hammer,
                 { onSwipe: this.switchsong.bind(this) },
@@ -39228,9 +39247,13 @@ var Musicplaymin = function (_React$Component) {
                     { id: 'minplayer' },
                     _react2.default.createElement(
                         'audio',
-                        { id: 'min-music-source' },
+                        { id: 'min-music-source', src: arrmusicsource[this.props.playindex] },
                         arrmusicsource.map(function (map, index) {
-                            return _react2.default.createElement('source', { src: map, key: index });
+                            if (index == _this3.props.playindex) {
+                                return _react2.default.createElement('source', { src: map, key: index, type: 'audio/mp3', className: 'active' });
+                            } else {
+                                return _react2.default.createElement('source', { src: map, key: index, type: 'audio/mp3' });
+                            }
                         })
                     ),
                     _react2.default.createElement(
@@ -39240,36 +39263,62 @@ var Musicplaymin = function (_React$Component) {
                             'ul',
                             null,
                             arrmusicsource.map(function (map, index) {
-                                return _react2.default.createElement(
-                                    'li',
-                                    { 'data-id': index, key: index },
-                                    _react2.default.createElement(
-                                        'div',
-                                        { id: 'messagediv' },
-                                        _react2.default.createElement('img', { src: musicicon[index] }),
+                                if (index == _this3.props.playindex) {
+                                    return _react2.default.createElement(
+                                        'li',
+                                        { 'data-id': index, key: index, className: 'active' },
                                         _react2.default.createElement(
                                             'div',
-                                            { id: 'songandsinger' },
+                                            { id: 'messagediv' },
+                                            _react2.default.createElement('img', { src: musicicon[index] }),
                                             _react2.default.createElement(
-                                                'span',
-                                                { id: 'song' },
-                                                musicname[index]
-                                            ),
-                                            _react2.default.createElement(
-                                                'span',
-                                                { id: 'singer' },
-                                                singer[index]
+                                                'div',
+                                                { id: 'songandsinger' },
+                                                _react2.default.createElement(
+                                                    'span',
+                                                    { id: 'song' },
+                                                    musicname[index]
+                                                ),
+                                                _react2.default.createElement(
+                                                    'span',
+                                                    { id: 'singer' },
+                                                    singer[index]
+                                                )
                                             )
                                         )
-                                    )
-                                );
+                                    );
+                                } else {
+                                    return _react2.default.createElement(
+                                        'li',
+                                        { 'data-id': index, key: index },
+                                        _react2.default.createElement(
+                                            'div',
+                                            { id: 'messagediv' },
+                                            _react2.default.createElement('img', { src: musicicon[index] }),
+                                            _react2.default.createElement(
+                                                'div',
+                                                { id: 'songandsinger' },
+                                                _react2.default.createElement(
+                                                    'span',
+                                                    { id: 'song' },
+                                                    musicname[index]
+                                                ),
+                                                _react2.default.createElement(
+                                                    'span',
+                                                    { id: 'singer' },
+                                                    singer[index]
+                                                )
+                                            )
+                                        )
+                                    );
+                                }
                             })
                         )
                     ),
                     _react2.default.createElement(
                         'div',
                         { id: 'minplayer-icon' },
-                        _react2.default.createElement('div', { id: 'playstate', className: this.props.musicState, onClick: this.props.playstate }),
+                        _react2.default.createElement('div', { id: 'playstate', className: this.props.musicState, onClick: this.props.playstateswitch }),
                         _react2.default.createElement('div', { className: 'list-icon' })
                     )
                 )
@@ -39318,6 +39367,67 @@ exports.musicState = musicState;
 function musicState() {
     return {
         type: 'musicstate'
+    };
+}
+
+/***/ }),
+/* 258 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.playindex = playindex;
+function playindex() {
+    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { playindex: 0, max: 12 };
+    var action = arguments[1];
+
+    console.log(action.type);
+    if (action.type == 'pre') {
+        state.playindex == 0 ? state.playindex = state.max : state.playindex -= 1;
+        console.log(state.playindex, 'pre', state.max);
+    } else if (action.type == 'next') {
+        state.playindex == state.max ? state.playindex = 0 : state.playindex += 1;
+        console.log(state.playindex, 'next');
+    }
+
+    return { playindex: state.playindex, max: state.max };
+}
+
+/***/ }),
+/* 259 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.nextplayindex = nextplayindex;
+function nextplayindex() {
+    return {
+        type: 'next'
+    };
+}
+
+/***/ }),
+/* 260 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.preplayindex = preplayindex;
+function preplayindex() {
+    return {
+        type: 'pre'
     };
 }
 

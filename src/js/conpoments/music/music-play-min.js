@@ -9,32 +9,22 @@ export default class Musicplaymin extends React.Component{
     }
     switchsong(events){
         if(events.direction==2){
-            if($('#playingmusic ul').find('.active').next().length){
-                $('#playingmusic ul').find('.active').removeClass().next().addClass('active');               
-                $('#min-music-source').find('.active').removeClass().next().addClass('active');
-            }
-            else{
-                $('#min-music-source').find('.active').removeClass();
-                $('#min-music-source').children().first().addClass('active');
-                $('#playingmusic ul').find('.active').removeClass();
-                $('#playingmusic ul li').first().addClass('active');
-            }
+            
+            this.props.playswitchnext();
         }
         else if(events.direction==4){
-            if($('#playingmusic ul').find('.active').prev().length){
-                $('#playingmusic ul').find('.active').removeClass().prev().addClass('active');
-                $('#min-music-source').find('.active').removeClass().prev().addClass('active');
-            }
-            else{
-
-                $('#min-music-source').find('.active').removeClass();
-                $('#min-music-source').children().last().addClass('active')
-                $('#playingmusic ul').find('.active').removeClass();
-                $('#playingmusic ul li').last().addClass('active');
-            }
+            
+            this.props.playswitchpre();
         }
     }
     componentDidMount() {
+        
+            console.log( $('#min-music-source')[0]);
+            if(this.props.musicState=='playing'){
+                $('#min-music-source')[0].play();
+            }else{
+                $('#min-music-source')[0].pause();
+            }
        window.getdata = (data)=>{
            this.setState({
             musicdata:data
@@ -55,28 +45,37 @@ export default class Musicplaymin extends React.Component{
              singer.push(musicdata.data[value].singer);
              musicname.push(value);
         }
-    console.log(this.props.musicState)
         return (
             <Hammer onSwipe={this.switchsong.bind(this)}>
         <div id='minplayer'>
-            <audio  id='min-music-source'>
+            <audio  id='min-music-source' src={arrmusicsource[this.props.playindex]}>
                 {
-                    arrmusicsource.map(function(map,index){
-                        return <source  src={map} key={index}/>
+                    arrmusicsource.map((map,index)=>{
+                        if(index==this.props.playindex){
+                                return <source  src={map} key={index}  type="audio/mp3" className="active"/>}
+                        else{
+                                return <source  src={map} key={index}  type="audio/mp3"/>
+                        }
+
                     })
                 }
             </audio>
             <div id="playingmusic">
                 <ul>
                 {
-                     arrmusicsource.map(function(map,index){
-                        return <li data-id={index} key={index}><div id='messagediv'><img src={musicicon[index]} /><div id='songandsinger'><span id="song">{musicname[index]}</span><span id='singer'>{singer[index]}</span></div></div></li>
+                     arrmusicsource.map((map,index)=>{
+                         if(index==this.props.playindex){
+                                 return <li data-id={index} key={index} className="active"><div id='messagediv'><img src={musicicon[index]} /><div id='songandsinger'><span id="song">{musicname[index]}</span><span id='singer'>{singer[index]}</span></div></div></li>
+                         }
+                         else{
+                                 return <li data-id={index} key={index}><div id='messagediv'><img src={musicicon[index]} /><div id='songandsinger'><span id="song">{musicname[index]}</span><span id='singer'>{singer[index]}</span></div></div></li>
+                         }
                     })
                 }
                 </ul>
             </div>
             <div id='minplayer-icon'>
-                <div id='playstate' className={this.props.musicState} onClick={this.props.playstate}></div>
+                <div id='playstate' className={this.props.musicState} onClick={this.props.playstateswitch}></div>
                 <div className='list-icon'></div>
             </div>
         </div> 
