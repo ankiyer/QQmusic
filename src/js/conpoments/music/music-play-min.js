@@ -9,16 +9,19 @@ export default class Musicplaymin extends React.Component{
     }
     switchsong(events){
         if(events.direction==2){
-            
             this.props.playswitchnext();
         }
         else if(events.direction==4){
-            
             this.props.playswitchpre();
         }
+        if(this.props.musicState=='pause'){
+          this.props.playstateswitch();
+        }
+
+        $('#min-music-source')[0].play();
     }
     componentDidMount() {
-        
+
             console.log( $('#min-music-source')[0]);
             if(this.props.musicState=='playing'){
                 $('#min-music-source')[0].play();
@@ -30,7 +33,7 @@ export default class Musicplaymin extends React.Component{
             musicdata:data
            })
         }
-        
+
 }
     render(){
         let musicdata = this.state.musicdata,
@@ -78,8 +81,8 @@ export default class Musicplaymin extends React.Component{
                 <div id='playstate' className={this.props.musicState} onClick={this.props.playstateswitch}></div>
                 <div className='list-icon'></div>
             </div>
-        </div> 
+        </div>
         </Hammer>
         )
-    } 
+    }
 }
