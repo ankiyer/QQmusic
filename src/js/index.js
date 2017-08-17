@@ -13,21 +13,31 @@ import { createStore } from 'redux';
 import Reallogin from './conpoments/login/reallogin.js';
 import {preplayindex} from './redux/actions/preplayindex.js';
 import {nextplayindex} from './redux/actions/nextplayindex.js';
+import {imgplay} from './redux/actions/imgplay.js';
 let store = createStore(reducers);
 class QQmusic extends React.Component{
     constructor(){
      super();
      this.playtime=0;
+     this.settime = setInterval(()=>{
+      this.props.dispatch(imgplay())
+  },150)
     }
     switchmusic(){
-      console.log()
             if(this.props.state.musicState.musicState=='playing'){
                 $('#min-music-source')[0].play();
+                clearInterval(this.settime);
+                this.settime = setInterval(()=>{
+                  this.props.dispatch(imgplay())
+              },200)
             }else{
+              console.log(this.settime,'this.props.')
+              clearInterval(this.settime);
                 $('#min-music-source')[0].pause();
             }
     }
     render(){
+      console.log("this.settime ",this.settime )
         let {state,dispatch}=this.props;
         let Firstpagestyle,Zhutistyle,realloginstyle;
         console.log(state)
@@ -66,7 +76,6 @@ class QQmusic extends React.Component{
           loginClick={()=>{$('#reallogin').fadeIn();dispatch(login());}} 
           loginstyle={state.loginicon} 
           zhutistate={state.tzhuti.zhuti}
-    
           playstateswitch={()=>{
             dispatch(musicState())
             this.switchmusic();
@@ -74,6 +83,7 @@ class QQmusic extends React.Component{
           playindex={state.playindex.playindex}
           playswitchpre={()=>{dispatch(preplayindex())}}
           playswitchnext={()=>{dispatch(nextplayindex())}}
+          rotate={state.musicState.rotate}
           ></Page>
           <Zhuti 
           realstyle={Zhutistyle} 

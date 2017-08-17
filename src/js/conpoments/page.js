@@ -8,7 +8,7 @@ export default class Page extends React.Component{
         super();
     }
     render(){
-        
+        console.log(this.props.rotateswitch)
         return (
             <div className='page' style={this.props.realstyle}>
                 <Title zhutiClick={this.props.zhutiClick.bind(this)}></Title>
@@ -21,6 +21,7 @@ export default class Page extends React.Component{
                 playindex={this.props.playindex}
                 playswitchpre={this.props.playswitchpre}
                 playswitchnext={this.props.playswitchnext}
+                rotate={this.props.rotate}
                 ></Musicplaymin>
             </div>
         )

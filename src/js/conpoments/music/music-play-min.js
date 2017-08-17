@@ -1,5 +1,6 @@
 import React from 'react';
 var Hammer = require('react-hammerjs');
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 export default class Musicplaymin extends React.Component{
     constructor(){
         super();
@@ -7,23 +8,34 @@ export default class Musicplaymin extends React.Component{
             musicdata:""
         }
     }
+    end(){
+        this.props.playswitchnext();
+    }
     switchsong(events){
         if(events.direction==2){
-            
             this.props.playswitchnext();
         }
         else if(events.direction==4){
-            
             this.props.playswitchpre();
         }
+        if(this.props.musicState=='pause'){
+          this.props.playstateswitch();
+        }
+
+        $('#min-music-source')[0].play();
     }
     componentDidMount() {
+            if(this.props.musicState=='playing'&&$('#min-music-source')[0].readyState==4){
+                $('#min-music-source')[0].play();
+            }else{
+                $('#min-music-source')[0].pause();
+            }
        window.getdata = (data)=>{
            this.setState({
             musicdata:data
            })
         }
-        
+
 }
     render(){
         let musicdata = this.state.musicdata,
@@ -38,10 +50,13 @@ export default class Musicplaymin extends React.Component{
              singer.push(musicdata.data[value].singer);
              musicname.push(value);
         }
+        let imgstyle ={
+            transform : `rotate(${this.props.rotate}deg)`
+        }
         return (
             <Hammer onSwipe={this.switchsong.bind(this)}>
         <div id='minplayer'>
-            <audio  id='min-music-source' src={arrmusicsource[this.props.playindex]} onEnded={this.props.playswitchnext}>
+            <audio  id='min-music-source' src={arrmusicsource[this.props.playindex]} onEnded={this.end.bind(this)} autoPlay='autoPlay'>
                 {
                     arrmusicsource.map((map,index)=>{
                         if(index==this.props.playindex){
@@ -58,7 +73,15 @@ export default class Musicplaymin extends React.Component{
                 {
                      arrmusicsource.map((map,index)=>{
                          if(index==this.props.playindex){
-                                 return <li data-id={index} key={index} className="active"><div id='messagediv'><img src={musicicon[index]} /><div id='songandsinger'><span id="song">{musicname[index]}</span><span id='singer'>{singer[index]}</span></div></div></li>
+                             if(this.props.musicState=='playing'){
+                                 return<li data-id={index} key={index} className="active"><div id='messagediv'><img 
+                                 src={musicicon[index]} key={index} style={imgstyle} className="iconactive"/>
+                                     <div id='songandsinger'><span id="song">{musicname[index]}</span><span id='singer'>{singer[index]}</span></div></div></li>
+                             }else{
+                                return <li data-id={index} key={index} className="active"><div id='messagediv'><img src={musicicon[index]} key={index} style={imgstyle} />
+                                     <div id='songandsinger'><span id="song">{musicname[index]}</span><span id='singer'>{singer[index]}</span></div></div></li>
+                             }
+                                
                          }
                          else{
                                  return <li data-id={index} key={index}><div id='messagediv'><img src={musicicon[index]} /><div id='songandsinger'><span id="song">{musicname[index]}</span><span id='singer'>{singer[index]}</span></div></div></li>
@@ -71,8 +94,8 @@ export default class Musicplaymin extends React.Component{
                 <div id='playstate' className={this.props.musicState} onClick={this.props.playstateswitch}></div>
                 <div className='list-icon'></div>
             </div>
-        </div> 
+        </div>
         </Hammer>
         )
-    } 
+    }
 }

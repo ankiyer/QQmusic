@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 import {loginicon} from './loginicon.js';
 import {musicState} from './music-state.js';
 import {playindex} from './playindex.js';
+import {imgplay} from './imgplay.js';
 function tzhuti(state={zhuti:false},action){
     if(action.type=='zhuti'){
         state.zhuti=!state.zhuti;
