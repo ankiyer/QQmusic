@@ -18,13 +18,6 @@ export default class Musicplaymin extends React.Component{
         }
     }
     componentDidMount() {
-        
-            console.log( $('#min-music-source')[0]);
-            if(this.props.musicState=='playing'){
-                $('#min-music-source')[0].play();
-            }else{
-                $('#min-music-source')[0].pause();
-            }
        window.getdata = (data)=>{
            this.setState({
             musicdata:data
@@ -48,7 +41,7 @@ export default class Musicplaymin extends React.Component{
         return (
             <Hammer onSwipe={this.switchsong.bind(this)}>
         <div id='minplayer'>
-            <audio  id='min-music-source' src={arrmusicsource[this.props.playindex]}>
+            <audio  id='min-music-source' src={arrmusicsource[this.props.playindex]} onEnded={this.props.playswitchnext}>
                 {
                     arrmusicsource.map((map,index)=>{
                         if(index==this.props.playindex){

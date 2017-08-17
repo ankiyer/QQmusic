@@ -53,11 +53,13 @@
                 z-index: 1111;
                 right: 0;
                 #playstate{
+                    position: absolute;
+                    top: 50%;
+                    transform: translateY(-50%);
                     background-image: url('../QQmusic/src/img/stateicon.png');
                     width: 30px;
                     height: 30px;
                     display: inline-block;
-                    
                     background-size: 155px 210px;
                 }
                 .pause{
@@ -66,6 +68,16 @@
                 }
                 .playing{
                     background-position: -30px 60px;
+                }
+                #playstate{
+                    position: absolute;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background-image: url('../QQmusic/src/img/stateicon.png');
+                    width: 30px;
+                    height: 30px;
+                    display: inline-block;           
+                    background-size: 155px 210px;
                 }
         }
 }
